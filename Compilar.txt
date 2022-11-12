@@ -1,0 +1,15 @@
+/*345.34.3*45.8*/
+program suma;
+var a, b,d,ifa,c : string;
+	j : real;
+	h,o,i,k : int;
+begin
+a := b;
+	if a == a then 
+		begin
+ 			a := 5;
+		end 	
+	else 	
+		begin
+		end
+end.

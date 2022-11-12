@@ -1,0 +1,18 @@
+/*345.34.3*45.8*/
+program suma;
+var a, b,d,ifa,c : string;
+    j : real;
+    h,o,i,z : int;
+begin
+    a := j / 5 * j + h + c;
+    if j > h then 
+        begin
+            a := "Soy una cadena";
+        end 	
+    else 	
+	begin
+            while ifa == c do
+                begin 
+                end
+	end
+end.
