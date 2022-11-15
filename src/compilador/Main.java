@@ -14,7 +14,14 @@ public class Main {
         if(!lexico.errorEncontrado) {
             System.out.println("Analisis lexico terminado.");
             Sintaxis sintaxis = new Sintaxis(lexico.p);
-            System.out.println("Analisis sintactico terminado.");
+            if (!sintaxis.errorEncontrado) {
+                System.out.println("Analisis sintactico terminado.");
+                sintaxis.nodoPolish = sintaxis.cabezaPolish;
+                while (sintaxis.nodoPolish != null) {
+                    System.out.print(sintaxis.nodoPolish.lexema + " ");
+                    sintaxis.nodoPolish = sintaxis.nodoPolish.sig;
+                }
+            }
         }
     }
     

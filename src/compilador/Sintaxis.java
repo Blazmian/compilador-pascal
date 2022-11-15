@@ -10,7 +10,9 @@ class Sintaxis {
 
     Nodo p;
     NodoVar cabeza = null, nodoV;
+    NodoPolish cabezaPolish = null, nodoPolish;
     boolean errorEncontrado = false;
+    int brincoIf = 1, brincoWhile = 1;
     
     String erroresSintacticos[][] = {
         {"Se espera la palabra program",                            "505"},
@@ -236,6 +238,10 @@ class Sintaxis {
                     // WHILE
                     verificarWhile();
                     break;
+                    
+                case 218:
+                    verificarRead();
+                    break;
 
                 case 215:
                     return;
@@ -273,23 +279,25 @@ class Sintaxis {
         switch (tipoCondicion) {
             // Asignacion de Variables
             case 1 ->
-                stopToken = 118;
+                stopToken = 118; // ;
             // If
             case 2 ->
-                stopToken = 212;
+                stopToken = 212; // then
             // While
             case 3 ->
-                stopToken = 203;
+                stopToken = 203; // do
         }
 
         while (p.token != stopToken) {
             Postfijo nPostfijo = null;
+            NodoPolish nPolish = null;
             switch (p.token) {
                 // Variables    
                 case 100:
                     int tipoVar = verificarExistenciaVar();
                     if (tipoVar != -1) {
                         nPostfijo = new Postfijo(tipoVar);
+                        //nPolish = new NodoPolish()
                     } else {
                         return null;
                     }
@@ -533,13 +541,27 @@ class Sintaxis {
     }
 
     private void verificarWrite() {
+        NodoPolish nPolish;
         p = p.sig;
         if (p.token == 132) {
             p = p.sig;
             while (p.token != 133) {
-                if (p.token == 100 || p.token == 128) {
+                if (p.token == 100 || p.token == 128 || p.token == 101 || p.token == 102) {
+                    // INSERTAMOS A LA LISTA DE POLISH
+                    nPolish = new NodoPolish(p.lexema, "");
+                    if (cabezaPolish == null) {
+                        cabezaPolish = nPolish;
+                        nodoPolish = cabezaPolish;
+                    } else {
+                        nodoPolish.sig = nPolish;
+                        nodoPolish = nPolish;
+                    }
                     p = p.sig;
                     if (p.token == 117) {
+                        // INSERTAMOS WRITE
+                        nPolish = new NodoPolish("write", "");
+                        nodoPolish.sig = nPolish;
+                        nodoPolish = nPolish;
                         p = p.sig;
                     }
                 } else {
@@ -547,6 +569,53 @@ class Sintaxis {
                     return;
                 }
             }
+            // INSERTAMOS WRITE
+            // INSERTAMOS WRITE
+            nPolish = new NodoPolish("write", "");
+            nodoPolish.sig = nPolish;
+            nodoPolish = nPolish;
+            p = p.sig;
+            if (p.token != 118) {
+                imprimirErrores(507);
+            }
+        } else {
+            imprimirErrores(516);
+        }
+    }
+    
+    private void verificarRead(){
+        NodoPolish nPolish;
+        p = p.sig;
+        if (p.token == 132) {
+            p = p.sig;
+            while (p.token != 133) {
+                if (p.token == 100) {
+                    // INSERTAMOS A LA LISTA DE POLISH
+                    nPolish = new NodoPolish(p.lexema, "");
+                    if (cabezaPolish == null) {
+                        cabezaPolish = nPolish;
+                        nodoPolish = cabezaPolish;
+                    } else {
+                        nodoPolish.sig = nPolish;
+                        nodoPolish = nPolish;
+                    }
+                    p = p.sig;
+                    if (p.token == 117) {
+                        // INSERTAMOS READ
+                        nPolish = new NodoPolish("read", "");
+                        nodoPolish.sig = nPolish;
+                        nodoPolish = nPolish;
+                        p = p.sig;
+                    }
+                } else {
+                    imprimirErrores(523);
+                    return;
+                }
+            }
+            // INSERTAMOS READ
+            nPolish = new NodoPolish("read", "");
+            nodoPolish.sig = nPolish;
+            nodoPolish = nPolish;
             p = p.sig;
             if (p.token != 118) {
                 imprimirErrores(507);
