@@ -6,10 +6,11 @@ package compilador;
  */
 public class NodoPolish {
     
-    String lexema, brinco;
+    String lexema;
+    String[] brinco;
     NodoPolish sig;
 
-    public NodoPolish(String lexema, String brinco) {
+    public NodoPolish(String lexema, String[] brinco) {
         this.lexema = lexema;
         this.brinco = brinco;
     }

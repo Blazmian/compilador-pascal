@@ -14,7 +14,10 @@ begin
     else 	
 	begin
             while ifa == c do
-                begin 
+                begin
+                    write("HOLA DON PANCHO");
                 end
+            write("Finaliza while");
 	end
+    write("Finaliza if");
 end.

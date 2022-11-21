@@ -12,7 +12,9 @@ class Sintaxis {
     NodoVar cabeza = null, nodoV;
     NodoPolish cabezaPolish = null, nodoPolish;
     boolean errorEncontrado = false;
-    int brincoIf = 1, brincoWhile = 1;
+    int brincoIfFalso = 1, brincoIfIncondicional = 1,
+            brincoWhileFalso = 1, brincoWhileIncondicional = 1;
+    LinkedList apuntadoresEntrantes = new LinkedList();
     
     String erroresSintacticos[][] = {
         {"Se espera la palabra program",                            "505"},
@@ -273,7 +275,7 @@ class Sintaxis {
     private Postfijo pasarAPostfijo(int tipoCondicion) {
         Postfijo cabezaP = null;
         Postfijo nodoP = null;
-        LinkedList pilaAux = new LinkedList();
+        LinkedList pilaAux = new LinkedList(), pilaAuxPolish = new LinkedList();
 
         int stopToken = 0;
         switch (tipoCondicion) {
@@ -287,6 +289,14 @@ class Sintaxis {
             case 3 ->
                 stopToken = 203; // do
         }
+        
+        String[] apuntadores = null;
+        if (!apuntadoresEntrantes.isEmpty()) {
+            apuntadores = new String[apuntadoresEntrantes.size()];
+            for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                apuntadores[i] = apuntadoresEntrantes.pop().toString();
+            }
+        }
 
         while (p.token != stopToken) {
             Postfijo nPostfijo = null;
@@ -297,7 +307,7 @@ class Sintaxis {
                     int tipoVar = verificarExistenciaVar();
                     if (tipoVar != -1) {
                         nPostfijo = new Postfijo(tipoVar);
-                        //nPolish = new NodoPolish()
+                        nPolish = new NodoPolish(p.lexema, apuntadores);
                     } else {
                         return null;
                     }
@@ -306,16 +316,18 @@ class Sintaxis {
                 // Numeros Enteros
                 case 101:
                     nPostfijo = new Postfijo(206);
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     break;
 
                 // Numeros Reales
                 case 102:
                     nPostfijo = new Postfijo(207);
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     break;
 
                 // Operador Suma
                 case 103:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -324,7 +336,7 @@ class Sintaxis {
 
                 // Operador Resta
                 case 104:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -333,7 +345,7 @@ class Sintaxis {
 
                 // Operador Multiplicacion    
                 case 105:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -342,7 +354,7 @@ class Sintaxis {
 
                 // Operador Division    
                 case 106:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -351,7 +363,7 @@ class Sintaxis {
 
                 // Operador Mayor Que    
                 case 107:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -360,7 +372,7 @@ class Sintaxis {
 
                 // Operador Menor Que    
                 case 108:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -369,7 +381,7 @@ class Sintaxis {
 
                 // Operador Igual Que    
                 case 109:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -378,7 +390,7 @@ class Sintaxis {
 
                 // Operador Mayor Igual Que    
                 case 110:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -387,7 +399,7 @@ class Sintaxis {
 
                 // Operador Menor Igual Que    
                 case 111:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -396,7 +408,7 @@ class Sintaxis {
 
                 // Operador Asignacion
                 case 130:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -404,7 +416,7 @@ class Sintaxis {
                     continue;
 
                 case 134:
-                    nPostfijo = meterOperadores(pilaAux, nodoP);
+                    nPostfijo = meterOperadores(pilaAux, nodoP, pilaAuxPolish);
                     if (nPostfijo != null) {
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
@@ -414,12 +426,14 @@ class Sintaxis {
                 // Cadena de Caracteres
                 case 128:
                     nPostfijo = new Postfijo(208);
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     break;
 
                 // True o False    
                 case 209:
                 case 210:
                     nPostfijo = new Postfijo(217);
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     break;
 
                 default:
@@ -433,6 +447,14 @@ class Sintaxis {
                 nodoP.sig = nPostfijo;
                 nodoP = nPostfijo;
             }
+            
+            if (cabezaPolish == null) {
+                cabezaPolish = nPolish;
+                nodoPolish = cabezaPolish;
+            } else {
+                nodoPolish.sig = nPolish;
+                nodoPolish = nPolish;
+            }
 
             p = p.sig;
         }
@@ -441,13 +463,21 @@ class Sintaxis {
             nodoP.sig = nodoAux;
             nodoP = nodoAux;
         }
+        
+        while (!pilaAuxPolish.isEmpty()) {
+            NodoPolish nPolish = new NodoPolish(pilaAuxPolish.pop().toString(), null);
+            nodoPolish.sig = nPolish;
+            nodoPolish = nPolish;
+        }
         return cabezaP;
     }
 
-    private Postfijo meterOperadores(LinkedList pilaAux, Postfijo nodoP) {
+    private Postfijo meterOperadores(LinkedList pilaAux, Postfijo nodoP, LinkedList pilaAuxPolish) {
         Postfijo nPostfijo;
+        NodoPolish nPolish;
         if (pilaAux.isEmpty()) {
             pilaAux.push(p.token);
+            pilaAuxPolish.push(p.lexema);
             p = p.sig;
             return null;
         } else {
@@ -457,8 +487,11 @@ class Sintaxis {
                 case 1:
                     while (true) {
                         nPostfijo = new Postfijo((int) pilaAux.pop());
+                        nPolish = new NodoPolish(pilaAuxPolish.pop().toString(), null);
                         nodoP.sig = nPostfijo;
                         nodoP = nPostfijo;
+                        nodoPolish.sig = nPolish;
+                        nodoPolish = nPolish;
                         tokOp = (int) pilaAux.getFirst();
                         switch (verificarPrioridadOperadores(tokOp, p.token)) {
                             case 1:
@@ -466,14 +499,19 @@ class Sintaxis {
 
                             case 2:
                                 nPostfijo = new Postfijo((int) pilaAux.pop());
+                                nPolish = new NodoPolish(pilaAuxPolish.pop().toString(), null);
                                 nodoP.sig = nPostfijo;
                                 nodoP = nPostfijo;
+                                nodoPolish.sig = nPolish;
+                                nodoPolish = nPolish;
                                 pilaAux.push(p.token);
+                                pilaAuxPolish.push(p.lexema);
                                 p = p.sig;
                                 break;
 
                             case 3:
                                 pilaAux.push(p.token);
+                                pilaAuxPolish.push(p.lexema);
                                 p = p.sig;
                                 break;
                         }
@@ -483,14 +521,19 @@ class Sintaxis {
 
                 case 2:
                     nPostfijo = new Postfijo((int) pilaAux.pop());
+                    nPolish = new NodoPolish(pilaAuxPolish.pop().toString(), null);
                     nodoP.sig = nPostfijo;
                     nodoP = nPostfijo;
+                    nodoPolish.sig = nPolish;
+                    nodoPolish = nPolish;
                     pilaAux.push(p.token);
+                    pilaAuxPolish.push(p.lexema);
                     p = p.sig;
                     break;
 
                 case 3:
                     pilaAux.push(p.token);
+                    pilaAuxPolish.push(p.lexema);
                     p = p.sig;
                     return null;
             }
@@ -539,7 +582,7 @@ class Sintaxis {
         }
         return prioridad;
     }
-
+    
     private void verificarWrite() {
         NodoPolish nPolish;
         p = p.sig;
@@ -548,7 +591,15 @@ class Sintaxis {
             while (p.token != 133) {
                 if (p.token == 100 || p.token == 128 || p.token == 101 || p.token == 102) {
                     // INSERTAMOS A LA LISTA DE POLISH
-                    nPolish = new NodoPolish(p.lexema, "");
+                    
+                    String[] apuntadores = null;
+                    if (!apuntadoresEntrantes.isEmpty()) {
+                        apuntadores = new String[apuntadoresEntrantes.size()];
+                        for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                            apuntadores[i] = apuntadoresEntrantes.pop().toString();
+                        }
+                    }
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     if (cabezaPolish == null) {
                         cabezaPolish = nPolish;
                         nodoPolish = cabezaPolish;
@@ -559,7 +610,7 @@ class Sintaxis {
                     p = p.sig;
                     if (p.token == 117) {
                         // INSERTAMOS WRITE
-                        nPolish = new NodoPolish("write", "");
+                        nPolish = new NodoPolish("write", null);
                         nodoPolish.sig = nPolish;
                         nodoPolish = nPolish;
                         p = p.sig;
@@ -571,7 +622,7 @@ class Sintaxis {
             }
             // INSERTAMOS WRITE
             // INSERTAMOS WRITE
-            nPolish = new NodoPolish("write", "");
+            nPolish = new NodoPolish("write", null);
             nodoPolish.sig = nPolish;
             nodoPolish = nPolish;
             p = p.sig;
@@ -591,7 +642,14 @@ class Sintaxis {
             while (p.token != 133) {
                 if (p.token == 100) {
                     // INSERTAMOS A LA LISTA DE POLISH
-                    nPolish = new NodoPolish(p.lexema, "");
+                    String[] apuntadores = null;
+                    if (!apuntadoresEntrantes.isEmpty()) {
+                        apuntadores = new String[apuntadoresEntrantes.size()];
+                        for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                            apuntadores[i] = apuntadoresEntrantes.pop().toString();
+                        }
+                    }
+                    nPolish = new NodoPolish(p.lexema, apuntadores);
                     if (cabezaPolish == null) {
                         cabezaPolish = nPolish;
                         nodoPolish = cabezaPolish;
@@ -602,7 +660,7 @@ class Sintaxis {
                     p = p.sig;
                     if (p.token == 117) {
                         // INSERTAMOS READ
-                        nPolish = new NodoPolish("read", "");
+                        nPolish = new NodoPolish("read", null);
                         nodoPolish.sig = nPolish;
                         nodoPolish = nPolish;
                         p = p.sig;
@@ -613,7 +671,7 @@ class Sintaxis {
                 }
             }
             // INSERTAMOS READ
-            nPolish = new NodoPolish("read", "");
+            nPolish = new NodoPolish("read", null);
             nodoPolish.sig = nPolish;
             nodoPolish = nPolish;
             p = p.sig;
@@ -630,39 +688,71 @@ class Sintaxis {
         if (p.token == 212) {
             imprimirErrores(523);
         }
+        
+        /* EXPRESION */
         Postfijo listaPostfijo = pasarAPostfijo(2);
 
         if (errorEncontrado) {
             return;
         }
+        
+        /* CODIGO QUE IMPRIME LA LISTA DE POSTFIJO */
         Postfijo aux = listaPostfijo;
-
         System.out.println("\nIF");
         while (aux != null) {
             System.out.print(aux.tipo + " ");
             aux = aux.sig;
         }
         System.out.println("");
+        /* FIN DE LA IMPRESION */
+        
+        /* SE EVALUA LA LISTA DE POSTFIJO */
         evaluarListaPostfijo(listaPostfijo);
         if (errorEncontrado) {
             return;
         }
+        
+        /* SALTO A FALSO */
+        NodoPolish nPolish = new NodoPolish("BRF-A" + brincoIfFalso, null);
+        nodoPolish.sig = nPolish;
+        nodoPolish = nPolish;
+        String apuntadorFalso = "A" + brincoIfFalso;
+        brincoIfFalso++;
+        
         p = p.sig;
         if (p.token == 214) {
-            while (p.token != 215) {
-                verificarBloque();
-            }
+            /* SENTENCIA 1 */
+            verificarBloque();
             p = p.sig;
+            
+            String[] apuntadores = null;
+            if (!apuntadoresEntrantes.isEmpty()) {
+                apuntadores = new String[apuntadoresEntrantes.size()];
+                for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                    apuntadores[i] = apuntadoresEntrantes.pop().toString();
+                }
+            }
+            
+            /* SALTO INCONDICIONAL */
+            nPolish = new NodoPolish("BRI-B" + brincoIfIncondicional, apuntadores);
+            nodoPolish.sig = nPolish;
+            nodoPolish = nPolish;
+            String apuntadorIncondicional = "B" + brincoIfIncondicional;
+            brincoIfIncondicional++;
+            
             if (p.token == 213) {
                 p = p.sig;
                 if (p.token == 214) {
-                    while (p.token != 215) {
-                        verificarBloque();
-                    }
+                    /* PREPARANDO EL APUNTADOR A FALSO */
+                    apuntadoresEntrantes.push(apuntadorFalso);
+                    /* SENTENCIA 2 */
+                    verificarBloque();
                 } else {
                     imprimirErrores(511);
                 }
             }
+            /* PREPARANDO EL APUNTADOR INCONDICIONAL */
+            apuntadoresEntrantes.push(apuntadorIncondicional);
         } else {
             imprimirErrores(511);
         }
@@ -673,11 +763,24 @@ class Sintaxis {
         if (p.token == 203) {
             imprimirErrores(523);
         }
+        
+        String apuntadorIncondicional = "D" + brincoWhileIncondicional;
+        brincoWhileIncondicional++;
+        /* PREPARANDO EL APUNTADOR INCONDICIONAL */
+        apuntadoresEntrantes.push(apuntadorIncondicional);
+        
         Postfijo listaPostfijo = pasarAPostfijo(3);
 
         if (errorEncontrado) {
             return;
         }
+        
+        NodoPolish nPolish = new NodoPolish("BRF-C" + brincoWhileFalso, null);
+        nodoPolish.sig = nPolish;
+        nodoPolish = nPolish;
+        String apuntadorFalso = "C" + brincoWhileFalso;
+        brincoWhileFalso++;
+        
         Postfijo aux = listaPostfijo;
 
         System.out.println("\nWHILE");
@@ -685,6 +788,7 @@ class Sintaxis {
             System.out.print(aux.tipo + " ");
             aux = aux.sig;
         }
+        
         System.out.println("");
         evaluarListaPostfijo(listaPostfijo);
         if (errorEncontrado) {
@@ -692,9 +796,19 @@ class Sintaxis {
         }
         p = p.sig;
         if (p.token == 214) {
-            while (p.token != 215) {
-                verificarBloque();
+            verificarBloque();
+            String[] apuntadores = null;
+            if (!apuntadoresEntrantes.isEmpty()) {
+                apuntadores = new String[apuntadoresEntrantes.size()];
+                for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                    apuntadores[i] = apuntadoresEntrantes.pop().toString();
+                }
             }
+            nPolish = new NodoPolish("BRI-" + apuntadorIncondicional, apuntadores);
+            nodoPolish.sig = nPolish;
+            nodoPolish = nPolish;
+            /* PREPARANDO EL APUNTADOR A FALSO */
+            apuntadoresEntrantes.push(apuntadorFalso);
         } else {
             imprimirErrores(511);
         }
