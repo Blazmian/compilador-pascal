@@ -1,23 +1,38 @@
-/*345.34.3*45.8*/
-program suma;
-var a, b,d,ifa,c : string;
-    j : real;
-    h,o,i,z : int;
+program MiEscuela;
+var 
+    totalAlumnos, contador : int;
+    calificacion, suma, promedio : real;
 begin
-    write(a, "asd");
-    read(b,d);
-    a := j / 5 * j + h + c;
-    if j > h then 
+    write("-BIENVENIDO MAESTR@-");
+    write("Ingrese cuantos alumnos se encuentran inscritos: ");
+    read(totalAlumnos);
+    contador := 1;
+    suma := 0;
+    while contador <= totalAlumnos do
         begin
-            a := "Soy una cadena";
-        end 	
-    else 	
-	begin
-            while ifa == c do
+            write("Ingrese la calificacion del alumno " , contador, ": ");
+            read(calificacion);
+            suma := suma + calificacion;
+            contador := contador + 1;
+        end
+    promedio := suma / totalAlumnos;
+    if promedio > 90 then
+        begin
+            write("¡Felicidades!, tu grupo tiene un promedio de ", promedio);
+        end
+    else
+        begin
+            if promedio >= 80 then
                 begin
-                    write("HOLA DON PANCHO");
+                    write("¡Cuidado!, tu grupo cuanta con un promedio de ", promedio);
                 end
-            write("Finaliza while");
-	end
-    write("Finaliza if");
+            else
+                begin
+                    if promedio < 80 then
+                        begin
+                            write("Tu grupo esta perdido");
+                        end
+                end
+        end
+    write("Fin del programa");
 end.

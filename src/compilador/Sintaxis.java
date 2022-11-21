@@ -94,8 +94,8 @@ class Sintaxis {
     int[][] asignacion = {
         //               Int Real String Boolean
         //               206  207    208     217
-        /*    Int 206*/ {206,  -1,   -1,     -1},
-        /*   Real 207*/ { -1, 207,   -1,     -1},
+        /*    Int 206*/ {206, 207,   -1,     -1},
+        /*   Real 207*/ {207, 207,   -1,     -1},
         /* String 208*/ { -1,  -1,  208,     -1},
         /*Boolean 217*/ { -1,  -1,   -1,    217}
     };
@@ -111,6 +111,7 @@ class Sintaxis {
             if (errorEncontrado) {
                 break;
             }
+            this.p = this.p.sig;
             verificarBloque();
             if (errorEncontrado) {
                 break;
@@ -219,7 +220,6 @@ class Sintaxis {
 
     private void verificarBloque() {
         while (true) { // REPITE HASTA ENCONTRARSE CON END
-            p = p.sig;
             switch (p.token) {
                 case 100:
                     // ASIGNACION A VARIABLE
@@ -270,6 +270,7 @@ class Sintaxis {
         }
         System.out.println("");
         evaluarListaPostfijo(listaPostfijo);
+        p = p.sig;
     }
 
     private Postfijo pasarAPostfijo(int tipoCondicion) {
@@ -610,7 +611,7 @@ class Sintaxis {
                     String[] apuntadores = null;
                     if (!apuntadoresEntrantes.isEmpty()) {
                         apuntadores = new String[apuntadoresEntrantes.size()];
-                        for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                        for (int i = 0; i < apuntadores.length; i++) {
                             apuntadores[i] = apuntadoresEntrantes.pop().toString();
                         }
                     }
@@ -644,6 +645,7 @@ class Sintaxis {
             if (p.token != 118) {
                 imprimirErrores(507);
             }
+            p = p.sig;
         } else {
             imprimirErrores(516);
         }
@@ -660,7 +662,7 @@ class Sintaxis {
                     String[] apuntadores = null;
                     if (!apuntadoresEntrantes.isEmpty()) {
                         apuntadores = new String[apuntadoresEntrantes.size()];
-                        for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+                        for (int i = 0; i < apuntadores.length; i++) {
                             apuntadores[i] = apuntadoresEntrantes.pop().toString();
                         }
                     }
@@ -693,6 +695,7 @@ class Sintaxis {
             if (p.token != 118) {
                 imprimirErrores(507);
             }
+            p = p.sig;
         } else {
             imprimirErrores(516);
         }
@@ -737,6 +740,7 @@ class Sintaxis {
         p = p.sig;
         if (p.token == 214) {
             /* SENTENCIA 1 */
+            p = p.sig;
             verificarBloque();
             p = p.sig;
             
@@ -755,13 +759,15 @@ class Sintaxis {
             String apuntadorIncondicional = "B" + brincoIfIncondicional;
             brincoIfIncondicional++;
             
+            /* PREPARANDO EL APUNTADOR A FALSO */
+            apuntadoresEntrantes.push(apuntadorFalso);
             if (p.token == 213) {
                 p = p.sig;
                 if (p.token == 214) {
-                    /* PREPARANDO EL APUNTADOR A FALSO */
-                    apuntadoresEntrantes.push(apuntadorFalso);
                     /* SENTENCIA 2 */
+                    p = p.sig;
                     verificarBloque();
+                    p = p.sig;
                 } else {
                     imprimirErrores(511);
                 }
@@ -811,6 +817,7 @@ class Sintaxis {
         }
         p = p.sig;
         if (p.token == 214) {
+            p = p.sig;
             verificarBloque();
             String[] apuntadores = null;
             if (!apuntadoresEntrantes.isEmpty()) {
@@ -824,6 +831,7 @@ class Sintaxis {
             nodoPolish = nPolish;
             /* PREPARANDO EL APUNTADOR A FALSO */
             apuntadoresEntrantes.push(apuntadorFalso);
+            p = p.sig;
         } else {
             imprimirErrores(511);
         }
@@ -849,8 +857,8 @@ class Sintaxis {
                 lista = lista.sig;
             } else {
                 if (pila.size() > 1) {
-                    int op1 = obtenerIndiceMatrizOperador((int) pila.pop()), 
-                            op2 = obtenerIndiceMatrizOperador((int) pila.pop());
+                    int op2 = obtenerIndiceMatrizOperador((int) pila.pop()), 
+                            op1 = obtenerIndiceMatrizOperador((int) pila.pop());
                     int resultado = 0;
                     switch (lista.tipo) {
                         // Operador Suma
