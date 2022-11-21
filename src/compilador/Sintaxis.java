@@ -293,7 +293,7 @@ class Sintaxis {
         String[] apuntadores = null;
         if (!apuntadoresEntrantes.isEmpty()) {
             apuntadores = new String[apuntadoresEntrantes.size()];
-            for (int i = 0; i < apuntadoresEntrantes.size(); i++) {
+            for (int i = 0; i < apuntadores.length; i++) {
                 apuntadores[i] = apuntadoresEntrantes.pop().toString();
             }
         }
@@ -308,6 +308,9 @@ class Sintaxis {
                     if (tipoVar != -1) {
                         nPostfijo = new Postfijo(tipoVar);
                         nPolish = new NodoPolish(p.lexema, apuntadores);
+                        if (apuntadores != null) {
+                            apuntadores = null;
+                        }
                     } else {
                         return null;
                     }
@@ -317,12 +320,18 @@ class Sintaxis {
                 case 101:
                     nPostfijo = new Postfijo(206);
                     nPolish = new NodoPolish(p.lexema, apuntadores);
+                    if (apuntadores != null) {
+                            apuntadores = null;
+                        }
                     break;
 
                 // Numeros Reales
                 case 102:
                     nPostfijo = new Postfijo(207);
                     nPolish = new NodoPolish(p.lexema, apuntadores);
+                    if (apuntadores != null) {
+                            apuntadores = null;
+                        }
                     break;
 
                 // Operador Suma
@@ -427,6 +436,9 @@ class Sintaxis {
                 case 128:
                     nPostfijo = new Postfijo(208);
                     nPolish = new NodoPolish(p.lexema, apuntadores);
+                    if (apuntadores != null) {
+                        apuntadores = null;
+                    }
                     break;
 
                 // True o False    
@@ -434,6 +446,9 @@ class Sintaxis {
                 case 210:
                     nPostfijo = new Postfijo(217);
                     nPolish = new NodoPolish(p.lexema, apuntadores);
+                    if (apuntadores != null) {
+                        apuntadores = null;
+                    }
                     break;
 
                 default:
